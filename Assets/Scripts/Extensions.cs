@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 /**
  * @memo 2022
@@ -14,14 +13,14 @@ public static class Extensions
      * returns if is grounded esencially, creates a circle beneath you and if colliding
      * with anything that is on default mask then means you're grounded
      */
-    public static bool Raycast(this Rigidbody2D rb, Vector2 dir)
+    public static bool Raycast(this Rigidbody2D rb, Vector2 dir, float offset)
     {
         if (rb.isKinematic)//you dont handle physics, then return false 
         {
             return false;
         }
         float radius = .25f;//radius of the raycast circle to create
-        float distance = .375f;//distance from below player to check, currently hardcoded could be collider *-.375
+        float distance = .375f-offset;//distance from below player to check, currently hardcoded could be collider *-.375
         RaycastHit2D hit = Physics2D.CircleCast(rb.position, radius, dir.normalized, distance, defaultMask);//creates raycast circle
 
         //return hit.collider != null && hit.rigidbody != rb;
@@ -37,7 +36,37 @@ public static class Extensions
      */
     public static bool dotProduct(this Transform transform, Transform other, Vector2 direction)
     {
-        //Vector2 dir = other.position - transform.position;//gets dir pointing from other to transform, most case transform is player
-        return Vector2.Dot(direction.normalized, direction)>.6f;
+        Vector2 dir = other.position - transform.position;//gets dir pointing from other to transform, most case transform is player       
+        return Vector2.Dot(dir.normalized, direction)>.25f;
+    }
+    /**
+* @memo 2022
+* animates obj to movee up based on force
+*/
+    public static IEnumerator anim(this Transform transform, float force)
+    {
+        //isAnimating = true;
+        Vector3 restPos = transform.localPosition;
+        Vector3 animPos = restPos + Vector3.up *force;
+        //isAnimating = false;
+        yield return move(transform, restPos, animPos);
+        yield return move(transform, animPos, restPos);
+    }
+    /**
+* @memo 2022
+* lerps position between a and b
+*/
+    private static IEnumerator move(Transform transform, Vector3 f, Vector3 t)
+    {
+        float timer = 0;
+        float duration = .125f;
+        while (timer < duration)
+        {
+            float temp = timer / duration;
+            transform.localPosition = Vector3.Lerp(f, t, temp);
+            timer += Time.deltaTime;
+            yield return null;
+        }
+        transform.localPosition = t;
     }
 }

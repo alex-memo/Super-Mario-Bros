@@ -10,9 +10,9 @@ public class cameraScript : MonoBehaviour
     private Transform player;
     /**
      * @memo 2022
-     * Awake method, sets the player var to the player 
+     * Start method, sets the player var to the player 
      */
-    private void Awake()
+    private void Start()
     {
         player = Controller.instance.transform;
     }

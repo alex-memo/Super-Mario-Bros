@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 /**
  * @memo 2022
@@ -44,6 +42,7 @@ public class spriteRendererScript : MonoBehaviour
  */
     private void OnDisable()
     {
+        run.enabled = false;
         spriteRenderer.enabled = false;
     }
     /**
@@ -65,5 +64,13 @@ public class spriteRendererScript : MonoBehaviour
         {
             spriteRenderer.sprite = idle;
         }
+    }
+    /**
+     * @memo 2022
+     * getter fir sprite renderer
+     */
+    public SpriteRenderer getSpriteRenderer()
+    {
+        return spriteRenderer;
     }
 }

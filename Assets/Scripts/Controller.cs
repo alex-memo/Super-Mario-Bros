@@ -1,11 +1,23 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-
+/**
+ * @memo 2022
+ * player Controller script
+ */
 public class Controller : MonoBehaviour
 {
     public static Controller instance;
     private movementScript movement;
+
+    private spriteRendererScript smallRenderer;
+    private spriteRendererScript bigRenderer;
+    private deathAnimation deathAnimation;
+    private bool big => bigRenderer.enabled;
+    private bool isDead => deathAnimation.enabled;
+
+    private spriteRendererScript activeRenderer;
+    private CapsuleCollider2D capsuleColl;
+    private bool isStar;
     /**
      * @memo 2022
      * Awake method, creates an instance of the player controller
@@ -13,10 +25,15 @@ public class Controller : MonoBehaviour
     private void Awake()
     {
         movement = GetComponent<movementScript>();
+        deathAnimation = GetComponent<deathAnimation>();
+        smallRenderer = transform.GetChild(0).GetComponent<spriteRendererScript>();
+        bigRenderer = transform.GetChild(1).GetComponent<spriteRendererScript>();
+        capsuleColl = GetComponent<CapsuleCollider2D>();
+        activeRenderer = smallRenderer;
         if (instance == null)
         {
             instance = this;
-        }       
+        }
     }
     /**
      * @memo 2022
@@ -25,5 +42,119 @@ public class Controller : MonoBehaviour
     public movementScript getMovement()
     {
         return movement;
+    }
+    /**
+ * @memo 2022
+ * on player get hit
+ */
+    public void getHit()
+    {
+        if (isStar || isDead)
+        {
+            return;
+        }
+        if (big)
+        {
+            shrink();
+        }
+        else
+        {
+            die();
+        }
+    }
+    /**
+ * @memo 2022
+ * if big amrio shrink then do this
+ */
+    private void shrink()
+    {
+        smallRenderer.enabled = true;
+        bigRenderer.enabled = false;
+        activeRenderer = smallRenderer;
+        capsuleColl.size = new Vector2(.75f, 1);
+        capsuleColl.offset = new Vector2(0, 0);
+        StartCoroutine(scaleAnim());
+    }
+    /**
+ * @memo 2022
+ * when die do this
+ */
+    private void die()
+    {
+        smallRenderer.enabled = false;
+        bigRenderer.enabled = false;
+        deathAnimation.enabled = true;
+        gameManager.instance.onDie(3f);
+    }
+    /**
+* @memo 2022
+* player grow
+*/
+    public void grow()
+    {
+        smallRenderer.enabled = false;
+        bigRenderer.enabled = true;
+        activeRenderer = bigRenderer;
+        capsuleColl.size = new Vector2(.75f, 2);
+        capsuleColl.offset = new Vector2(0, .5f);
+        StartCoroutine(scaleAnim());
+    }
+    /**
+* @memo 2022
+* animation for when growing player
+*/
+    private IEnumerator scaleAnim()
+    {
+        float timer = 0;
+        float duration = .5f;
+        while (timer < duration)
+        {
+            if (Time.frameCount % 4 == 0)
+            {
+                smallRenderer.enabled = !smallRenderer.enabled;
+                bigRenderer.enabled = !smallRenderer.enabled;
+            }
+            timer += Time.deltaTime;
+            yield return null;
+        }
+        smallRenderer.enabled = false;
+        bigRenderer.enabled = false;
+        activeRenderer.enabled = true;
+    }
+    /**
+* @memo 2022
+* activate star item
+*/
+    public void star(float duration = 10)
+    {
+        StartCoroutine(starAnim(duration));
+    }
+    /**
+* @memo 2022
+* star animation
+*/
+    private IEnumerator starAnim(float duration)
+    {
+        isStar = true;
+        float timer = 0;
+        while (timer < duration)
+        {
+            timer += Time.deltaTime;
+            if (Time.frameCount % 4 == 0)
+            {
+                activeRenderer.getSpriteRenderer().color = Random.ColorHSV(0, 1, 1, 1, 1, 1);
+            }
+            yield return null;
+        }
+        activeRenderer.getSpriteRenderer().color = Color.white;
+        isStar = false;
+    }
+    /**
+* @memo 2022
+* getter for is star
+*/
+    public bool getIsStar()
+    {
+        return isStar;
     }
 }

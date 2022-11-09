@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 /**
  * @memo 2022
@@ -41,7 +39,7 @@ public class movementScript : MonoBehaviour
     void Update()
     {
         move();
-        isGrounded = body.Raycast(Vector2.down);//calls the extension file 
+        isGrounded = body.Raycast(Vector2.down, 0);//calls the extension file 
         if (isGrounded)
         {
             groundedMovement();
@@ -82,7 +80,7 @@ public class movementScript : MonoBehaviour
     {
         inputAxis = Input.GetAxis("Horizontal");
         velocity.x = Mathf.MoveTowards(velocity.x, inputAxis * moveSpeed, Time.deltaTime * moveSpeed);
-        if (body.Raycast(Vector2.right * velocity.x) && inputAxis == 1)//if player running into wall then (right)
+        if (body.Raycast(Vector2.right * velocity.x, GetComponent<Collider2D>().offset.x) && inputAxis == 1)//if player running into wall then (right)
         {
             velocity.x = 0;//set accel to that place to 0
         }
@@ -115,8 +113,23 @@ public class movementScript : MonoBehaviour
      */
     private void OnCollisionEnter2D(Collision2D collision)
     {
-
-        if (collision.gameObject.layer != LayerMask.NameToLayer("Items"))
+        if(collision.gameObject.layer== LayerMask.NameToLayer("Enemy"))
+        {
+            if (transform.dotProduct(collision.transform, Vector2.down))
+            {
+                
+                if (Input.GetButtonDown("Jump"))
+                {
+                    velocity.y = jumpForce;
+                }
+                else
+                {
+                    velocity.y = jumpForce / 2;
+                }
+                isJumping = true;
+            }
+        }
+        else if (collision.gameObject.layer != LayerMask.NameToLayer("Items"))
         {
 
             if (transform.dotProduct(collision.transform, Vector2.up))
