@@ -27,7 +27,10 @@ public class itemEnemyMovement : MonoBehaviour
  */
     private void OnBecameVisible()
     {
-        enabled = true;
+        if (!TryGetComponent(out itemScript itemScript))
+        {//if not item
+            enabled = true;
+        }
     }
     /**
  * @memo 2022

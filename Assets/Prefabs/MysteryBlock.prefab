@@ -127,3 +127,4 @@ MonoBehaviour:
   maxHits: 1
   brokenBlock: {fileID: 21300000, guid: 19a37ba4526c1274e83a7078a6fa9594, type: 3}
   item: {fileID: 11400000, guid: 25594cdd9f81f0c4889df540dd3f79f4, type: 2}
+  blockType: 1

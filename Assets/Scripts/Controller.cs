@@ -16,6 +16,7 @@ public class Controller : MonoBehaviour
     private bool isDead => deathAnimation.enabled;
 
     private spriteRendererScript activeRenderer;
+    private string size = "small";
     private CapsuleCollider2D capsuleColl;
     private bool isStar;
     /**
@@ -30,6 +31,7 @@ public class Controller : MonoBehaviour
         bigRenderer = transform.GetChild(1).GetComponent<spriteRendererScript>();
         capsuleColl = GetComponent<CapsuleCollider2D>();
         activeRenderer = smallRenderer;
+        size = "small";
         if (instance == null)
         {
             instance = this;
@@ -71,6 +73,7 @@ public class Controller : MonoBehaviour
         smallRenderer.enabled = true;
         bigRenderer.enabled = false;
         activeRenderer = smallRenderer;
+        size = "small";
         capsuleColl.size = new Vector2(.75f, 1);
         capsuleColl.offset = new Vector2(0, 0);
         StartCoroutine(scaleAnim());
@@ -95,6 +98,7 @@ public class Controller : MonoBehaviour
         smallRenderer.enabled = false;
         bigRenderer.enabled = true;
         activeRenderer = bigRenderer;
+        size = "big";
         capsuleColl.size = new Vector2(.75f, 2);
         capsuleColl.offset = new Vector2(0, .5f);
         StartCoroutine(scaleAnim());
@@ -156,5 +160,13 @@ public class Controller : MonoBehaviour
     public bool getIsStar()
     {
         return isStar;
+    }
+    /**
+     * @memo 2022
+     * getter for size
+     */
+    public string getSize()
+    {
+        return size;
     }
 }

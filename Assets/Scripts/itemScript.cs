@@ -39,6 +39,11 @@ public class itemScript : MonoBehaviour
     public void setItem(item i)
     {
         item = i;
+        movement = GetComponent<itemEnemyMovement>();
+        if (movement != null)
+        {
+            movement.enabled = item.isMove;
+        }
     }
     /**
 * @memo 2022
@@ -64,7 +69,7 @@ public class itemScript : MonoBehaviour
 
                 break;
             case item.EffectType.Star:
-                Controller.instance.star();
+                Controller.instance.star(item.effectDuration);
                 break;
             case item.EffectType.Ice_Plant:
 
