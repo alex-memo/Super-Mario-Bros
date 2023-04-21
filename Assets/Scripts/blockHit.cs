@@ -25,7 +25,11 @@ public class blockHit : MonoBehaviour
         {//if not currently animating the block & there is still something in box then
             if(collision.transform.dotProduct(transform, Vector2.up))
             {//checks if player hits from bottom to top
-                hit();
+                if(blockType!=BlockType.Solid)
+                {
+                    hit();
+                }
+                
             }
         }
     }
@@ -37,14 +41,18 @@ public class blockHit : MonoBehaviour
     {
         SpriteRenderer sprite = GetComponent<SpriteRenderer>();
         sprite.enabled = true;
-        if (!(blockType == BlockType.Brick&&Controller.instance.getSize().Equals("small")))
+        if (!(blockType == BlockType.Brick&&Controller.instance.getSize().Equals("small")&&item==null))
         {
             maxHits--;
 
             if (item != null)
             {
+                if (item.effectType != item.EffectType.Coin)
+                {
+                    Controller.instance.Play(gameManager.instance.getSoundManager().itemOutOfBox);
+                }
                 GameObject itemObj;
-                if (item.effectType == item.EffectType.Big_Mushroom && Controller.instance.getSize().Equals("big"))
+                if (item.effectType == item.EffectType.Big_Mushroom && (Controller.instance.getSize().Equals("big")|| Controller.instance.getSize().Equals("fire")))
                 {                    
                     itemObj = Instantiate(gameManager.instance.fireFlower.itemObject, transform.position, Quaternion.identity);
                     itemObj.GetComponent<itemScript>().setItem(gameManager.instance.fireFlower);
@@ -64,6 +72,7 @@ public class blockHit : MonoBehaviour
             if (brokenBlock == null)
             {
                 GetComponent<BoxCollider2D>().enabled = false;
+                Controller.instance.playBreakSound();
             }
         }
 

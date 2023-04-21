@@ -127,3 +127,4 @@ MonoBehaviour:
   maxHits: 1
   brokenBlock: {fileID: 0}
   item: {fileID: 0}
+  blockType: 0

@@ -7,7 +7,7 @@ using UnityEngine;
  */
 public class enemyScript : MonoBehaviour
 {
-    public Sprite deathSprite;//goomba should be flat, koopa should be shell
+    [SerializeField] protected Sprite deathSprite;//goomba should be flat, koopa should be shell
     /**
  * @memo 2022
  * on collision enter if player then die if stomped or hit player
@@ -50,6 +50,7 @@ public class enemyScript : MonoBehaviour
     {
         GetComponent<animationScript>().enabled = false;
         GetComponent<deathAnimation>().enabled = true;
+        Controller.instance.Play(gameManager.instance.getSoundManager().enemyDie);
         Destroy(gameObject, 3f);
     }
     /**
@@ -58,6 +59,7 @@ public class enemyScript : MonoBehaviour
  */
     protected virtual void onDie()
     {
+        Controller.instance.Play(gameManager.instance.getSoundManager().enemyDie);
         GetComponent<Collider2D>().enabled = false;
         GetComponent<itemEnemyMovement>().enabled = false;
         GetComponent<animationScript>().enabled = false;

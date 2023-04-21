@@ -1,9 +1,11 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using System.Collections;
+using UnityEngine.UI;
 /**
- * @memo 2022
- * Game manager script
- */
+* @memo 2022
+* Game manager script
+*/
 public class gameManager : MonoBehaviour
 {
     public static gameManager instance;
@@ -13,6 +15,13 @@ public class gameManager : MonoBehaviour
     private int coins;
 
     public item fireFlower;
+
+    private soundManager soundManager;
+    private AudioSource source;
+
+    private int timeToComplete = 300;
+    private int score = 0;
+
     /**
  * @memo 2022
  * On awake, create instance of game manager if there is alr on then destroy
@@ -21,14 +30,17 @@ public class gameManager : MonoBehaviour
     {
         if (instance == null)
         {
+            Application.targetFrameRate = 60;//sets the fps to 60
             instance = this;
+            soundManager = GetComponent<soundManager>();
+            source = GetComponent<AudioSource>();
             DontDestroyOnLoad(gameObject);
         }
         else
         {
             DestroyImmediate(gameObject);
         }
-
+        
     }
     /**
  * @memo 2022
@@ -47,8 +59,9 @@ public class gameManager : MonoBehaviour
  */
     void Start()
     {
-        Application.targetFrameRate = 60;//sets the fps to 60
+        Cursor.lockState = CursorLockMode.Locked;
         NewGame();
+        StartCoroutine(timerManager());
     }
     /**
  * @memo 2022
@@ -69,6 +82,14 @@ public class gameManager : MonoBehaviour
         world = w;
         stage = s;
         SceneManager.LoadScene($"{world}-{stage}");
+        if (!$"{world}-{stage}".Equals("1-2"))
+        {
+            Play(soundManager.overworld);
+        }
+        else
+        {
+            Play(soundManager.underworld);
+        }
     }
     /**
  * @memo 2022
@@ -93,7 +114,8 @@ public class gameManager : MonoBehaviour
     private void GameOver()
     {
         //for now just restart game after 3sec
-        Invoke(nameof(NewGame), 3f);
+        Play(soundManager.lose);
+        Invoke(nameof(NewGame), 7f);
     }
     /**
  * @memo 2022
@@ -101,7 +123,14 @@ public class gameManager : MonoBehaviour
  */
     public void onDie(float delay)//resets the level basically
     {
-        Invoke(nameof(onDie), delay);
+        if (lives > 1)
+        {
+            Invoke(nameof(onDie), delay);
+        }
+        else
+        {
+            Invoke(nameof(onDie),0);
+        }        
     }
     /**
      * @memo 2022
@@ -109,7 +138,8 @@ public class gameManager : MonoBehaviour
      */
     public void NextLevel()
     {
-        LoadLevel(world, stage + 1);//if full game remaking then should have logic as follows
+        LoadLevel(1, 1);
+        //LoadLevel(world, stage + 1);//if full game remaking then should have logic as follows
         /**
          * if(world==1&&stage==10)
          * {
@@ -124,6 +154,7 @@ public class gameManager : MonoBehaviour
 */
     public void addCoin()
     {
+        Controller.instance.Play(soundManager.coin);
         coins++;
         if (coins == 100)
         {
@@ -137,6 +168,56 @@ public class gameManager : MonoBehaviour
 */
     public void addLife()
     {
+        Controller.instance.Play(soundManager.oneUp);
         lives++;
     }
+    /**
+     * @memo 2022
+     * getter for soundmanager
+     */
+    public soundManager getSoundManager()
+    {
+        return soundManager;
+    }
+    /**
+     * @memo 2022
+     * plays the set clip
+     */
+    public void Play(AudioClip clip)
+    {
+        if (clip != null)
+        {
+            source.clip = clip;
+            source.Play();
+        }        
+    }
+    /**
+ * @memo 2022
+ * plays the win clip
+ */
+    public void PlayWin()
+    {
+        if (soundManager.win != null)
+        {
+            source.clip = null;
+            //source.Play();
+            source.PlayOneShot(soundManager.win);
+        }
+        StopCoroutine(timerManager());
+        score += timeToComplete * 100;
+        UIManager.Instance.UpdateScore(score);
+        timeToComplete= 0;
+        UIManager.Instance.UpdateTimer(timeToComplete);
+    }
+    private IEnumerator timerManager()
+    {
+        while (timeToComplete>0)
+        {
+            yield return new WaitForSeconds(1);
+            --timeToComplete;
+            UIManager.Instance.UpdateTimer(timeToComplete);
+        }
+        //die
+    }
+
 }
